@@ -1,0 +1,18 @@
+# OASIS_START
+# DO NOT EDIT (digest: 1dd7050bc498f5ca775641288ec47c29)
+version = "2.8.4+1"
+description = "Binding to libarchive"
+requires = "unix fileutils"
+archive(byte) = "archive-ocaml.cma"
+archive(native) = "archive-ocaml.cmxa"
+exists_if = "archive-ocaml.cma"
+package "lwt" (
+ version = "2.8.4+1"
+ description = "Binding to libarchive"
+ requires = "archive lwt"
+ archive(byte) = "archive-lwt.cma"
+ archive(native) = "archive-lwt.cmxa"
+ exists_if = "archive-lwt.cma"
+)
+# OASIS_STOP
+

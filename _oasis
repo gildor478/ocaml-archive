@@ -1,0 +1,56 @@
+OASISFormat: 0.2
+Name:        ocaml-archive
+Version:     2.8.4+1
+Synopsis:    Binding to libarchive
+Authors:     Sylvain Le Gall
+License:     LGPL-2.1 with OCaml linking exception
+Plugins:     DevFiles (0.2), META (0.2), StdFiles (0.2)
+BuildTools:  ocamlbuild
+
+Description:
+  libarchive is a C library for reading and writing tar, cpio, zip, ISO, and
+  other archive formats. This library is its OCaml bindings.
+  .
+   * Reads a variety of formats, including tar, pax, cpio, zip, xar, lha, ar,
+     cab, mtree, and ISO images.
+   * Writes tar, pax, cpio, zip, xar, ar, ISO, mtree, and shar archives.
+   * Full automatic format detection when reading archives, including
+     compressed archives. 
+  .
+  [libarchive website](http://code.google.com/p/libarchive/)
+
+Library "archive-ocaml"
+  Path:       src
+  Modules:    Archive, ArchiveLow
+  CSources:   Archive_stub.c
+  CCLib:      -larchive
+  FindlibName: archive
+  BuildDepends: unix, fileutils
+
+Library "archive-lwt"
+  Path:          src
+  BuildDepends:  archive, lwt, lwt.preemptive, threads
+  Modules:       ArchiveLwt
+  FindlibParent: archive-ocaml
+  FindlibName:   lwt
+  
+Executable test
+  Path:         test
+  BuildTools:   ocamlbuild
+  MainIs:       test.ml
+  BuildDepends: archive, archive.lwt, oUnit, extlib
+  Custom:       true
+  Install:      false
+  
+Test main
+  Command: $test
+  
+Document "api-archive"
+  Title:      API reference for Archive
+  InstallDir: $docdir
+  Type:       ocamlbuild (0.2)
+  InstallDir: $htmldir/api-archive
+  XOCamlbuildLibraries: archive, archive.lwt
+  XOCamlbuildPath:      src
+  BuildTools+: ocamldoc
+  

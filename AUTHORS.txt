@@ -1,0 +1,5 @@
+(* OASIS_START *)
+(* DO NOT EDIT (digest: c80a51936ebb8cbcacb7fa7079d3d04d) *)
+Authors of ocaml-archive
+Sylvain Le Gall
+(* OASIS_STOP *)
