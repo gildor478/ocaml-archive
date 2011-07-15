@@ -2,3 +2,4 @@ _build
 api-archive.docdir
 setup.log
 setup.data
+*.tar.gz
