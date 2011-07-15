@@ -1,6 +1,6 @@
 
 (** High-level archive handling
-  * @author Sylvain Le Gall
+    @author Sylvain Le Gall
   *)
 
 open ArchiveLow 
@@ -11,9 +11,9 @@ type filename = string
 module Read:
   sig
     (** This module allow to manipulate a read-only archive. Beware that the
-      * data defined in [input] will be used at creation to scan the content
-      * of the archive and then will be reused to fetch content. This means that
-      * the matching file can be open more than once.
+        data defined in [input] will be used at creation to scan the content
+        of the archive and then will be reused to fetch content. This means that
+        the matching file can be open more than once.
       *)
 
     type ('a, 'b) input =
@@ -46,7 +46,7 @@ module Read:
     val entry : ('a, 'b) t -> filename -> Entry.t
 
     (** [with_file t fn open read close] Read the content of a file, use the
-      * callbacks function [open], [read] and [close] to push the data.
+        callbacks function [open], [read] and [close] to push the data.
       *)
     val with_file : ('a, 'b) t -> filename ->
       (Entry.t -> 'c) ->
@@ -55,7 +55,7 @@ module Read:
       'd
 
     (** [content t fn] Simplified version of {!with_file}, using a [Buffer.t]
-      * and returning its content.
+        and returning its content.
       *)
     val content : ('a, 'b) t -> filename -> string
 

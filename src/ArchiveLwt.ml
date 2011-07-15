@@ -26,7 +26,7 @@ struct
           'a
       | `Filename of string ]
 
-    type ('a, 'b) t = ('a, 'b) StdRead.t
+  type ('a, 'b) t = ('a, 'b) StdRead.t
 
   let create input = 
     let input' = 

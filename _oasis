@@ -47,7 +47,6 @@ Test main
   
 Document "api-archive"
   Title:      API reference for Archive
-  InstallDir: $docdir
   Type:       ocamlbuild (0.2)
   InstallDir: $htmldir/api-archive
   XOCamlbuildLibraries: archive, archive.lwt

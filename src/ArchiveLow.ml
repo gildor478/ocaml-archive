@@ -1,14 +1,14 @@
 
 (** Low level function to libarchive
-  *
-  * This is the low level function which are almost a 1:1 mapping of libarchive
-  * functions. 
-  *
-  * Callbacks should only raise an {!AFailure} exception, this way they will
-  * trigger an [archive_set_error]. Any other exceptions will be mapped to a
-  * generic exception when setting error.
-  *
-  * @author Sylvain Le Gall
+   
+    This is the low level function which are almost a 1:1 mapping of libarchive
+    functions. 
+   
+    Callbacks should only raise an {!AFailure} exception, this way they will
+    trigger an [archive_set_error]. Any other exceptions will be mapped to a
+    generic exception when setting error.
+   
+    @author Sylvain Le Gall
   *)
 
 type 'a archive 

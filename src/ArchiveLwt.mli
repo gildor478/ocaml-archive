@@ -1,6 +1,6 @@
 
 (** Lwt version of {!Archive}
-  * @author Sylvain Le Gall
+    @author Sylvain Le Gall
   *)
 
 open Archive
