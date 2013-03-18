@@ -1,4 +1,5 @@
-OASISFormat: 0.2
+OASISFormat: 0.3
+OCamlVersion: >= 3.12.0 
 Name:        ocaml-archive
 Version:     2.8.4+1
 Synopsis:    Binding to libarchive
@@ -15,7 +16,7 @@ Description:
      cab, mtree, and ISO images.
    * Writes tar, pax, cpio, zip, xar, ar, ISO, mtree, and shar archives.
    * Full automatic format detection when reading archives, including
-     compressed archives. 
+     compressed archives.
   .
   [libarchive website](http://code.google.com/p/libarchive/)
 
@@ -29,11 +30,11 @@ Library "archive-ocaml"
 
 Library "archive-lwt"
   Path:          src
-  BuildDepends:  archive, lwt, lwt.preemptive, threads
+  BuildDepends:  archive, lwt (>= 2.3.2), lwt.preemptive, threads
   Modules:       ArchiveLwt
   FindlibParent: archive-ocaml
   FindlibName:   lwt
-  
+
 Executable test
   Path:         test
   BuildTools:   ocamlbuild
@@ -41,10 +42,10 @@ Executable test
   BuildDepends: archive, archive.lwt, oUnit, extlib
   Custom:       true
   Install:      false
-  
+
 Test main
   Command: $test
-  
+
 Document "api-archive"
   Title:      API reference for Archive
   Type:       ocamlbuild (0.2)
