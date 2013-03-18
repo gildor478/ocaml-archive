@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 1e680ada3bcad020df5c6126768fb271) *)
+(* DO NOT EDIT (digest: 5a671940341e8d6ffdb5bef3250bbcfc) *)
 module OASISGettext = struct
 # 21 "/home/gildor/programmation/oasis/src/oasis/OASISGettext.ml"
 
@@ -289,20 +289,11 @@ module MyOCamlbuildFindlib = struct
            * linking. *)
           List.iter 
             begin fun pkg ->
-              let base_args = [A"-package"; A pkg] in
-              let syn_args = [A"-syntax"; A "camlp4o"] in
-              let args =
-  			  (* heuristic to identify syntax extensions: 
-  				 whether they end in ".syntax"; some might not *)
-                if Filename.check_suffix pkg "syntax"
-                then syn_args @ base_args
-                else base_args
-              in
-              flag ["ocaml"; "compile";  "pkg_"^pkg] & S args;
-              flag ["ocaml"; "ocamldep"; "pkg_"^pkg] & S args;
-              flag ["ocaml"; "doc";      "pkg_"^pkg] & S args;
-              flag ["ocaml"; "link";     "pkg_"^pkg] & S base_args;
-              flag ["ocaml"; "infer_interface"; "pkg_"^pkg] & S args;
+              flag ["ocaml"; "compile";  "pkg_"^pkg] & S[A"-package"; A pkg];
+              flag ["ocaml"; "ocamldep"; "pkg_"^pkg] & S[A"-package"; A pkg];
+              flag ["ocaml"; "doc";      "pkg_"^pkg] & S[A"-package"; A pkg];
+              flag ["ocaml"; "link";     "pkg_"^pkg] & S[A"-package"; A pkg];
+              flag ["ocaml"; "infer_interface"; "pkg_"^pkg] & S[A"-package"; A pkg];
             end 
             (find_packages ());
 
@@ -484,7 +475,7 @@ module MyOCamlbuildBase = struct
 end
 
 
-# 487 "myocamlbuild.ml"
+# 478 "myocamlbuild.ml"
 open Ocamlbuild_plugin;;
 let package_default =
   {
@@ -504,6 +495,6 @@ let package_default =
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default package_default;;
 
-# 508 "myocamlbuild.ml"
+# 499 "myocamlbuild.ml"
 (* OASIS_STOP *)
 Ocamlbuild_plugin.dispatch dispatch_default;;

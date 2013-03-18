@@ -1,6 +1,6 @@
 # OASIS_START
-# DO NOT EDIT (digest: 9ab131ec4048852d12b0980ea0d5027d)
-version = "2.8.4+1"
+# DO NOT EDIT (digest: e90fde25a027946499a73c2d3472e144)
+version = "2.8.4+2"
 description = "Binding to libarchive"
 requires = "unix fileutils"
 archive(byte) = "archive-ocaml.cma"
@@ -9,7 +9,7 @@ archive(native) = "archive-ocaml.cmxa"
 archive(native, plugin) = "archive-ocaml.cmxs"
 exists_if = "archive-ocaml.cma"
 package "lwt" (
- version = "2.8.4+1"
+ version = "2.8.4+2"
  description = "Binding to libarchive"
  requires = "archive lwt lwt.preemptive threads"
  archive(byte) = "archive-lwt.cma"
