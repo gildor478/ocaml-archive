@@ -3,3 +3,5 @@ api-archive.docdir
 setup.log
 setup.data
 *.tar.gz
+dist
+test.byte
