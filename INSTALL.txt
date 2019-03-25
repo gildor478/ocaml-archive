@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: d07e7089a8d02b852e327db9989fe986) *)
+(* DO NOT EDIT (digest: 05a83c599d78efff16f49b535b4d2561) *)
 
 This is the INSTALL file for the ocaml-archive distribution.
 
@@ -14,6 +14,7 @@ In order to compile this package, you will need:
 * ocaml (>= 3.12.0) for all, test main, doc api-archive
 * findlib
 * fileutils for library archive-ocaml
+* bytes for library archive-ocaml
 * lwt (>= 2.3.2) for library archive-lwt
 * oUnit for executable test
 * extlib for executable test
