@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 27fd9341d48e797b6de4a0b1544ff270)
+# DO NOT EDIT (digest: beb818f1086bf2bcebd1aac66fa39e4b)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -22,10 +22,12 @@ true: annot, bin_annot
 "src/libarchive-ocaml_stubs.a": oasis_library_archive_ocaml_cclib
 "src/dllarchive-ocaml_stubs.so": oasis_library_archive_ocaml_cclib
 <src/archive-ocaml.{cma,cmxa}>: use_libarchive-ocaml_stubs
+"src/Archive_stub.c": pkg_bytes
 "src/Archive_stub.c": pkg_fileutils
 "src/Archive_stub.c": pkg_unix
 # Library archive-lwt
 "src/archive-lwt.cmxs": use_archive-lwt
+<src/*.ml{,i,y}>: pkg_bytes
 <src/*.ml{,i,y}>: pkg_fileutils
 <src/*.ml{,i,y}>: pkg_lwt
 <src/*.ml{,i,y}>: pkg_lwt.unix
@@ -33,6 +35,7 @@ true: annot, bin_annot
 <src/*.ml{,i,y}>: pkg_unix
 <src/*.ml{,i,y}>: use_archive-ocaml
 # Executable test
+"test/test.byte": pkg_bytes
 "test/test.byte": pkg_extlib
 "test/test.byte": pkg_fileutils
 "test/test.byte": pkg_lwt
@@ -42,6 +45,7 @@ true: annot, bin_annot
 "test/test.byte": pkg_unix
 "test/test.byte": use_archive-lwt
 "test/test.byte": use_archive-ocaml
+<test/*.ml{,i,y}>: pkg_bytes
 <test/*.ml{,i,y}>: pkg_extlib
 <test/*.ml{,i,y}>: pkg_fileutils
 <test/*.ml{,i,y}>: pkg_lwt

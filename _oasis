@@ -26,7 +26,7 @@ Library "archive-ocaml"
   CSources:   Archive_stub.c
   CCLib:      -larchive
   FindlibName: archive
-  BuildDepends: unix, fileutils
+  BuildDepends: unix, fileutils, bytes
 
 Library "archive-lwt"
   Path:          src
