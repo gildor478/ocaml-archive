@@ -1,14 +1,16 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 7c0eff931aa3463cbf720edcf74685b3) *)
+(* DO NOT EDIT (digest: d07e7089a8d02b852e327db9989fe986) *)
+
 This is the INSTALL file for the ocaml-archive distribution.
 
 This package uses OASIS to generate its build system. See section OASIS for
-full information. 
+full information.
 
 Dependencies
 ============
 
 In order to compile this package, you will need:
+
 * ocaml (>= 3.12.0) for all, test main, doc api-archive
 * findlib
 * fileutils for library archive-ocaml
@@ -27,7 +29,7 @@ Installing
 Uninstalling
 ============
 
-1. Go to the root of the package 
+1. Go to the root of the package
 2. Run 'ocaml setup.ml -uninstall'
 
 OASIS

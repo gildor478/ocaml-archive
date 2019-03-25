@@ -102,7 +102,7 @@ let [] | _ :: _ =
 
                      (* Read callback *)
                      (fun chn buf -> 
-                        input chn buf 0 (String.length buf)),
+                        input chn buf 0 (Bytes.length buf)),
                      
                      (* Skip callback *)
                      (fun chn off ->

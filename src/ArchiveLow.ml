@@ -21,7 +21,7 @@ type error_code = int
 type ('a, 'b) open_callback = 'a -> 'b
 
 (* archive_read_open2 read callback *)
-type 'a read_callback = 'a -> string -> int 
+type 'a read_callback = 'a -> bytes -> int 
 
 (* archive_read_open2 skip callback *)
 type 'a skip_callback = 'a -> int -> int

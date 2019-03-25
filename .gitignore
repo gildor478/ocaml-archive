@@ -5,3 +5,4 @@ setup.data
 *.tar.gz
 dist
 test.byte
+*.mldylib
