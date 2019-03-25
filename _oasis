@@ -30,7 +30,7 @@ Library "archive-ocaml"
 
 Library "archive-lwt"
   Path:          src
-  BuildDepends:  archive, lwt (>= 2.3.2), lwt.preemptive, threads
+  BuildDepends:  archive, lwt (>= 2.3.2), lwt.unix, threads
   Modules:       ArchiveLwt
   FindlibParent: archive-ocaml
   FindlibName:   lwt
