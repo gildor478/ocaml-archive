@@ -43,4 +43,4 @@ configure:
 # OASIS_STOP
 
 deploy:
-	admin-gallu-deploy --forge_upload --forge_group ocaml-archive --forge_user gildor-admin
+	admin-gallu-deploy
