@@ -165,7 +165,7 @@ void caml_archive_finalize (value vread)
   ptr_archive *ptr = Archive_val(vread);
   if (*ptr != NULL)
   {
-    archive_read_finish(*ptr);
+    archive_read_free(*ptr);
     *ptr = NULL;
   };
 };
@@ -209,7 +209,7 @@ CAMLprim value caml_archive_read_support_filter_all (value vread)
   CAMLparam1(vread);
   ptr = Archive_val(vread);
   caml_archive_check_error(
-      archive_read_support_compression_all(*ptr),
+      archive_read_support_filter_all(*ptr),
       *ptr);
   CAMLreturn(Val_unit);
 };
