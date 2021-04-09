@@ -1,0 +1,5 @@
+(test (name test) (libraries archive archive-lwt oUnit extlib))
+(alias
+ (name runtest)
+ (deps data/Makefile.bz2 data/ocaml-data-notation-0.0.6.tar.gz))
+

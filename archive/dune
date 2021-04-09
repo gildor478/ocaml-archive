@@ -1,0 +1,8 @@
+(library
+  (name archive)
+  (public_name archive)
+  (wrapped false)
+  (libraries unix fileutils bytes)
+  (foreign_stubs (language c) (names Archive_stub))
+  (c_library_flags -larchive))
+

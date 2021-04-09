@@ -3,7 +3,6 @@
     @author Sylvain Le Gall
   *)
 
-open Archive
 open ArchiveLow
 
 (* Lwt version of {!ArchiveLow.Read.open_callback} *)

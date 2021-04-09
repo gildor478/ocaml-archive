@@ -31,7 +31,7 @@ struct
   let create input = 
     let input' = 
       match input with 
-        | `Callback (data, open_cbk, read_cbk, skip_cbk, close_cbk) -> 
+        | `Callback (_data, _open_cbk, _read_cbk, _skip_cbk, _close_cbk) -> 
             assert(false)
 
         | `Filename fn ->

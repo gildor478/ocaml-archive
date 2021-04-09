@@ -1,0 +1,6 @@
+(library
+  (name archive_lwt)
+  (public_name archive-lwt)
+  (wrapped false)
+  (libraries archive lwt lwt.unix threads))
+
