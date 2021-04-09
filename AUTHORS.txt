@@ -1,4 +1,0 @@
-Authors of ocaml-archive:
-
-* Sylvain Le Gall
-

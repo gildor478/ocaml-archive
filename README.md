@@ -1,6 +1,9 @@
 ocaml-archive - Binding to libarchive
 =====================================
 
+[![Travis status][travis-img]][travis]
+[![AppVeyor status][appveyor-img]][appveyor]
+
 libarchive is a C library for reading and writing tar, cpio, zip, ISO, and
 other archive formats. This library is its OCaml bindings.
 
@@ -12,8 +15,26 @@ other archive formats. This library is its OCaml bindings.
 
 [libarchive website](http://code.google.com/p/libarchive/)
 
-See the file [INSTALL.txt](INSTALL.txt) for building and installation
-instructions.
+[travis]:         https://travis-ci.org/gildor478/ocaml-archive
+[travis-img]:     https://travis-ci.org/gildor478/ocaml-archive.svg?branch=master
+[appveyor]:       https://ci.appveyor.com/project/gildor478/ocaml-archive
+[appveyor-img]:   https://ci.appveyor.com/api/projects/status/g86mhhc0dda25llx/branch/master?svg=true
+[opam]:           https://opam.ocaml.org
+
+Installation
+------------
+
+The recommended way to install ocaml-archive is via [opam]:
+
+```sh
+$ opam install archive archive-lwt
+```
+
+Documentation
+-------------
+
+API documentation is
+[available online](https://gildor478.github.io/ocaml-archive).
 
 Copyright and license
 ---------------------
