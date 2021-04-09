@@ -61,7 +61,7 @@ let [] | _ :: _ =
           let _, dump = 
             read_tarball 
               (Archive.Read.create 
-                 (`Filename "test/data/ocaml-data-notation-0.0.6.tar.gz"))
+                 (`Filename "data/ocaml-data-notation-0.0.6.tar.gz"))
               "ocaml-data-notation-0.0.6/_oasis"
           in
             assert_equal
@@ -78,7 +78,7 @@ let [] | _ :: _ =
             (fun () ->
                let _arch =
                  Archive.Read.create
-                   (`Filename "test/data/Makefile.bz2")
+                   (`Filename "data/Makefile.bz2")
                in
                  ()));
 
@@ -87,14 +87,14 @@ let [] | _ :: _ =
           let exp_lst, exp_dump = 
             read_tarball 
               (Archive.Read.create 
-                 (`Filename "test/data/ocaml-data-notation-0.0.6.tar.gz"))
+                 (`Filename "data/ocaml-data-notation-0.0.6.tar.gz"))
               "ocaml-data-notation-0.0.6/_oasis"
           in
           let lst, dump =
             read_tarball
               (Archive.Read.create
                  (`Callback 
-                    ("test/data/ocaml-data-notation-0.0.6.tar.gz",
+                    ("data/ocaml-data-notation-0.0.6.tar.gz",
                      
                      (* Open callback *)
                      (fun fn ->
@@ -128,13 +128,13 @@ let [] | _ :: _ =
           let exp_lst, exp_dump = 
             read_tarball 
               (Archive.Read.create 
-                 (`Filename "test/data/ocaml-data-notation-0.0.6.tar.gz"))
+                 (`Filename "data/ocaml-data-notation-0.0.6.tar.gz"))
               "ocaml-data-notation-0.0.6/_oasis"
           in
           let lst, dump = 
             Lwt_main.run
               (read_tarball_lwt
-                 (`Filename "test/data/ocaml-data-notation-0.0.6.tar.gz")
+                 (`Filename "data/ocaml-data-notation-0.0.6.tar.gz")
                  "ocaml-data-notation-0.0.6/_oasis")
           in
             ListString.assert_equal 
