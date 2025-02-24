@@ -122,11 +122,11 @@ static value stat_aux(const struct stat *buf)
   CAMLparam0();
   CAMLlocal5(atime, mtime, ctime, offset, v);
 
-  atime = copy_double((double) buf->st_atime);
-  mtime = copy_double((double) buf->st_mtime);
-  ctime = copy_double((double) buf->st_ctime);
+  atime = caml_copy_double((double) buf->st_atime);
+  mtime = caml_copy_double((double) buf->st_mtime);
+  ctime = caml_copy_double((double) buf->st_ctime);
   offset = caml_copy_int64(buf->st_size);
-  v = alloc_small(12, 0);
+  v = caml_alloc_small(12, 0);
   Field (v, 0) = Val_int (buf->st_dev);
   Field (v, 1) = Val_int (buf->st_ino);
   for (i = 0; i < sizeof(file_kind_table) / sizeof(int); i++)
@@ -229,11 +229,10 @@ CAMLprim value caml_archive_read_open_filename (value vread, value vfn, value vb
 {
   ptr_archive *ptr = NULL;
   int   res = ARCHIVE_OK;
-  char *fn = NULL;
   int   block_size = 0;
   CAMLparam3(vread, vfn, vblock_size);
   ptr = Archive_val(vread);
-  fn  = String_val(vfn);
+  const char *fn  = String_val(vfn);
   block_size = Int_val(vblock_size);
 
   caml_enter_blocking_section();
@@ -293,12 +292,11 @@ CAMLprim value caml_archive_read_data (value vread, value vstr, value voff, valu
   int size = 0;
   ptr_archive *ptr = NULL;
   int off = 0, len = 0;
-  char *str = NULL;
 
   CAMLparam4(vread, vstr, voff, vlen);
 
   ptr = Archive_val(vread);
-  str = String_val(vstr);
+  const char *str = String_val(vstr);
   off = Int_val(voff);
   len = Int_val(vlen);
 
@@ -307,7 +305,8 @@ CAMLprim value caml_archive_read_data (value vread, value vstr, value voff, valu
   assert(len >= 0);
 
   caml_enter_blocking_section();
-  size = archive_read_data(*ptr, str + off, len);
+  char *str_off = (char*)str + off;
+  size = archive_read_data(*ptr, str_off, len);
   caml_leave_blocking_section();
 
   if (size < 0)
@@ -361,10 +360,10 @@ CAMLprim int caml_archive_set_error (struct archive *ptr, value vres)
   {
     vexn = Extract_exception(vres);
     if (Wosize_val(vexn) == 3 && Field(vexn, 0) == *caml_named_value("archive.failure"))
-    {   
+    {
       assert(Is_long(Field(vexn, 1)));
       assert(Is_block(Field(vexn, 2) && Tag_val(Field(vexn, 2)) == String_tag));
-      archive_set_error(ptr, Int_val(Field(vexn, 1)), String_val(Field(vexn, 2)));
+      archive_set_error(ptr, Int_val(Field(vexn, 1)), "%s", String_val(Field(vexn, 2)));
     }
     else
     {
