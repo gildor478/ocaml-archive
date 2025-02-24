@@ -1,6 +1,4 @@
-version = dev
-
-default: test
+default: build test
 
 build:
 	dune build @install
@@ -13,36 +11,33 @@ test:
 
 all:
 	dune build @all
-	dune runtest
+
+install:
+	dune install
+
+uninstall:
+	dune uninstall
 
 clean:
 	dune clean
 
-.PHONY: build doc test all uninstall clean
+fmt:
+	dune fmt
 
-PRECOMMIT_ARGS= \
-	    --exclude log-html \
-	    --exclude Makefile
+lint:
+	opam-dune-lint
+	dune build @fmt
 
-precommit:
-	 -@if command -v OCamlPrecommit > /dev/null; then \
-	   OCamlPrecommit $(PRECOMMIT_ARGS); \
-	 else \
-	   echo "Skipping precommit checks.";\
-	 fi
+git-pre-commit-hook: test lint
 
-test: precommit
-
-.PHONY: precommit
+.PHONY: build doc test all install uninstall clean fmt lint git-pre-commit-hook
 
 deploy: doc test
 	dune-release lint
-	git push --all
 	dune-release tag
-	dune-release distrib --skip-tests
-	dune-release publish
-	dune-release opam pkg
-	dune-release opam submit
+	git push --all
+	git push --tag
+	dune-release
 
 .PHONY: deploy
 

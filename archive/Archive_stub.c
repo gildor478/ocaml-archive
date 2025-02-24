@@ -44,7 +44,7 @@ void caml_archive_check_error (int error, ptr_archive arch)
   CAMLreturn0;
 };
 
-/* 
+/*
  * Entry
  */
 
@@ -74,7 +74,7 @@ CAMLprim value caml_archive_entry_create (value vunit)
   ptr_archive_entry *ptr = NULL;
   CAMLparam1(vunit);
   CAMLlocal1(vres);
-  vres = caml_alloc_custom(&caml_archive_entry_ops, 
+  vres = caml_alloc_custom(&caml_archive_entry_ops,
       sizeof(ptr_archive_entry), 0, 1);
   ptr = Entry_val(vres);
   *ptr = archive_entry_new();
@@ -105,7 +105,7 @@ CAMLprim value caml_archive_entry_pathname (value ventry)
   CAMLparam1(ventry);
   CAMLlocal1(vres);
   /* TODO: check for null string */
-  vres = 
+  vres =
     caml_copy_string(
       archive_entry_pathname(*Entry_val(ventry)));
   CAMLreturn(vres);
@@ -189,7 +189,7 @@ CAMLprim value caml_archive_read_create (value vunit)
   CAMLparam1(vunit);
   CAMLlocal1(vres);
 
-  vres = caml_alloc_custom(&caml_archive_ops, 
+  vres = caml_alloc_custom(&caml_archive_ops,
       sizeof(ptr_archive),
       0, 1);
   ptr = Archive_val(vres);
@@ -257,7 +257,7 @@ CAMLprim value caml_archive_read_next_header2 (value vread, value ventry)
   ret = archive_read_next_header2(*ptr, *ptre);
   caml_leave_blocking_section();
 
-  switch (ret) 
+  switch (ret)
   {
     case ARCHIVE_OK:
       vres = Val_true;
@@ -334,10 +334,10 @@ CAMLprim value caml_archive_read_close (value vread)
 
 
 /*
- * read_open2 and all callbacks 
+ * read_open2 and all callbacks
  */
 
-#define READ_BUFFER 4096 
+#define READ_BUFFER 4096
 
 struct read_cbk_data {
   value open_cbk;
@@ -423,7 +423,7 @@ CAMLprim ssize_t caml_archive_read_callback2(struct archive *ptr, struct read_cb
   else
   {
     ret = Int_val(res);
-    memcpy(data->buffer_c, String_val(data->buffer), ret); 
+    memcpy(data->buffer_c, String_val(data->buffer), ret);
   };
 
   CAMLreturnT(ssize_t, ret);
@@ -511,11 +511,11 @@ CAMLprim int caml_archive_close_callback(struct archive *ptr, void *client_data)
 };
 
 CAMLprim value caml_archive_read_open2_native (
-    value vread, 
-    value vopen_cbk, 
-    value vread_cbk, 
-    value vskip_cbk, 
-    value vclose_cbk, 
+    value vread,
+    value vopen_cbk,
+    value vread_cbk,
+    value vskip_cbk,
+    value vclose_cbk,
     value vdata)
 {
   struct read_cbk_data *read_cbk = NULL;
@@ -548,8 +548,8 @@ CAMLprim value caml_archive_read_open2_native (
 
   caml_enter_blocking_section();
   res = archive_read_open2(
-      *ptr, 
-      read_cbk, 
+      *ptr,
+      read_cbk,
       caml_archive_open_callback,
       caml_archive_read_callback,
       caml_archive_skip_callback,
@@ -579,3 +579,4 @@ CAMLprim value caml_archive_init (value vunit)
   caml_register_custom_operations(&caml_archive_ops);
   CAMLreturn(Val_unit);
 };
+
