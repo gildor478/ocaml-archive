@@ -1,9 +1,25 @@
+(executable
+ (name discover)
+ (modules Discover)
+ (libraries dune-configurator))
+
+(rule
+ (targets flags.sexp library_flags.sexp)
+ (action
+  (run ./discover.exe)))
+
 (library
  (name archive)
  (public_name archive)
  (wrapped false)
  (libraries unix fileutils bytes)
+ (modules ArchiveLow Archive)
  (foreign_stubs
   (language c)
-  (names Archive_stub))
- (c_library_flags -larchive))
+  (names Archive_stub)
+  (flags
+   :standard
+   (:include flags.sexp)))
+ (c_library_flags
+  :standard
+  (:include library_flags.sexp)))
