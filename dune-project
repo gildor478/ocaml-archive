@@ -1,6 +1,6 @@
 (lang dune 3.17)
 
-(name ocaml-archive)
+(name archive)
 
 (generate_opam_files true)
 
