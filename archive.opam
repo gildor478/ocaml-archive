@@ -41,3 +41,11 @@ build: [
   ]
 ]
 dev-repo: "git+https://github.com/gildor478/ocaml-archive.git"
+depexts: [
+  ["libarchive"] {os = "macos" & os-distribution = "homebrew"}
+  ["libarchive"] {os = "macos" & os-distribution = "macports"}
+  ["libarchive-devel"] {os = "win32" & os-distribution = "cygwin"}
+  ["libarchive-dev"] {os-distribution = "alpine"}
+  ["libarchive-dev"] {os-family = "debian"}
+]
+
