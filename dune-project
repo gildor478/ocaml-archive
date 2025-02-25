@@ -30,6 +30,7 @@
  (depends
    (ocaml (>= 4.14.1))
    (fileutils (>= 0.6.6))
+   (conf-pkg-config :build)
    (extlib (and (>= 1.8.0) :with-test))
    (ounit2 (and (>= 2.2.7) :with-test))))
 
