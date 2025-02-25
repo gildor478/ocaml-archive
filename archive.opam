@@ -53,5 +53,6 @@ depexts: [
   ["libarchive"] {os-family = "gentoo"}
   ["libarchive"] {os-family = "bsd"}
   ["libarchive"] {os-family = "suse"}
+  ["libarchive"] {os-family = "opensuse"}
 ]
 
