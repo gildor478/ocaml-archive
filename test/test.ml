@@ -45,13 +45,20 @@ let ([] | _ :: _) =
                "c9b290271ca1da665261520256a8a7a1"
                (Digest.to_hex (Digest.string dump)) );
            ( "BadFile" >:: fun () ->
-             assert_raises
-               (ArchiveLow.AFailure (84, "Unrecognized archive format"))
-               (fun () ->
-                 let _arch =
-                   Archive.Read.create (`Filename "data/Makefile.bz2")
+                 let msg =
+                   try
+                     let _arch =
+                       Archive.Read.create (`Filename "data/Makefile.bz2")
+                     in
+                     assert_failure "Expecting to fail"
+                   with ArchiveLow.AFailure (_, msg) ->
+                     msg
                  in
-                 ()) );
+                 assert_equal
+                   ~msg:"Exception message"
+                   ~printer:(fun s -> s)
+                   "Unrecognized archive format"
+                   msg );
            ( "read_open2" >:: fun () ->
              let exp_lst, exp_dump =
                read_tarball
