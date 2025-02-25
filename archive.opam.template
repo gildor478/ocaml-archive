@@ -2,7 +2,13 @@ depexts: [
   ["libarchive"] {os = "macos" & os-distribution = "homebrew"}
   ["libarchive"] {os = "macos" & os-distribution = "macports"}
   ["libarchive-devel"] {os = "win32" & os-distribution = "cygwin"}
-  ["libarchive-dev"] {os-distribution = "alpine"}
+  ["libarchive-dev" "openssl-dev"] {os-distribution = "alpine"}
   ["libarchive-dev"] {os-family = "debian"}
+  ["libarchive-dev"] {os-family = "ubuntu"}
+  ["libarchive-devel"] {os-family = "fedora"}
+  ["libarchive-devel"] {os-family = "rhel"}
+  ["libarchive"] {os-family = "gentoo"}
+  ["libarchive"] {os-family = "bsd"}
+  ["libarchive"] {os-family = "suse"}
 ]
 
