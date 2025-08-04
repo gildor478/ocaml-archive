@@ -1,3 +1,8 @@
+## v3.7.2+6 - 2025-08-04
+
+### Fixed
+- Drop dependencies to `bytes`(see ocaml/dune#650).
+
 ## v3.7.2+5 - 2025-02-26
 
 ### Fixed

@@ -12,7 +12,7 @@
  (name archive)
  (public_name archive)
  (wrapped false)
- (libraries unix fileutils bytes)
+ (libraries unix fileutils)
  (modules ArchiveLow Archive)
  (foreign_stubs
   (language c)
