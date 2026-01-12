@@ -14,7 +14,14 @@ module Read = struct
       * ('a, 'b) ArchiveLow.open_callback
       * 'b ArchiveLow.read_callback
       * 'b ArchiveLow.skip_callback
-      * 'b ArchiveLow.close_callback ]
+      * 'b ArchiveLow.close_callback
+    | `Callback_seekable of
+      'a
+      * ('a, 'b) ArchiveLow.open_callback
+      * 'b ArchiveLow.read_callback
+      * 'b ArchiveLow.skip_callback
+      * 'b ArchiveLow.close_callback
+      * 'b ArchiveLow.seek_callback ]
 
   type ('a, 'b) t = {
     ard_input : ('a, 'b) input;
@@ -30,6 +37,9 @@ module Read = struct
         match input with
         | `Filename fn -> ArchiveLow.Read.open_filename hdl fn 4096
         | `Callback (data, open_cbk, read_cbk, skip_cbk, close_cbk) ->
+            ArchiveLow.Read.open2 hdl open_cbk read_cbk skip_cbk close_cbk data
+        | `Callback_seekable (data, open_cbk, read_cbk, skip_cbk, close_cbk, seek_cbk) ->
+            ArchiveLow.Read.Unsafe.set_seek_callback hdl seek_cbk;
             ArchiveLow.Read.open2 hdl open_cbk read_cbk skip_cbk close_cbk data
       in
       let res = f hdl in
