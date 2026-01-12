@@ -26,6 +26,7 @@ struct caml_archive {
   value open_cbk;
   value read_cbk;
   value skip_cbk;
+  value seek_cbk;
   value close_cbk;
   value client_data;
   value client_data2;
@@ -176,6 +177,7 @@ CAMLprim value caml_archive_entry_stat (value ventry)
 void caml_archive_finalize (value vread)
 {
   ptr_archive ptr = Archive_val(vread);
+  caml_remove_global_root(&(ptr->seek_cbk));
   if (ptr->archive != NULL)
   {
     archive_read_free(ptr->archive);
@@ -206,6 +208,8 @@ CAMLprim value caml_archive_read_create (value vunit)
       sizeof(struct caml_archive),
       0, 1);
   ptr = Archive_val(vres);
+  caml_register_global_root(&(ptr->seek_cbk));
+  ptr->seek_cbk = Val_unit;
   ptr->archive = archive_read_new ();
   if (ptr->archive == NULL)
   {
@@ -473,6 +477,43 @@ CAMLprim off_t caml_archive_skip_callback(struct archive *ptr, void *client_data
 
 };
 
+static int seek_command_table[] = {
+  [SEEK_SET]=0,
+  [SEEK_CUR]=1,
+  [SEEK_END]=2
+};
+
+CAMLprim off_t caml_archive_seek_callback2(struct archive *ptr, struct caml_archive *data, off_t offset, int whence)
+{
+  off_t ret = 0;
+
+  CAMLparam0();
+  CAMLlocal1(res);
+  res = caml_callback3_exn(data->seek_cbk, data->client_data2, Val_long(offset), Val_int(seek_command_table[whence]));
+  if (caml_archive_set_error(ptr, res))
+  {
+    ret = 0;
+  }
+  else
+  {
+    ret = Int_val(res);
+  };
+
+  CAMLreturnT(off_t, ret);
+}
+
+CAMLprim off_t caml_archive_seek_callback(struct archive *ptr, void *client_data, off_t offset, int whence)
+{
+  off_t res = 0;
+
+  caml_leave_blocking_section();
+  res = caml_archive_seek_callback2(ptr, client_data, offset, whence);
+  caml_enter_blocking_section();
+
+  return res;
+
+}
+
 CAMLprim int caml_archive_close_callback2 (struct archive *ptr, struct caml_archive *data)
 {
   int ret = ARCHIVE_OK;
@@ -507,6 +548,16 @@ CAMLprim int caml_archive_close_callback(struct archive *ptr, void *client_data)
   caml_enter_blocking_section();
 
   return res;
+};
+
+CAMLprim value caml_archive_read_set_seek_callback (value vread, value vseek_cbk)
+{
+  ptr_archive ptr = NULL;
+  CAMLparam1(vread);
+  ptr = Archive_val(vread);
+  ptr->seek_cbk = vseek_cbk;
+  archive_read_set_seek_callback(ptr->archive, caml_archive_seek_callback);
+  CAMLreturn(Val_unit);
 };
 
 CAMLprim value caml_archive_read_open2_native (

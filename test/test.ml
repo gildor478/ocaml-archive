@@ -29,6 +29,23 @@ module ListString = OUnitDiff.ListSimpleMake (struct
   let pp_print_sep = OUnitDiff.pp_comma_separator
 end)
 
+let unix_input fn =
+  `Callback_seekable (
+    fn,
+    (* Open callback *)
+    (fun fn -> Unix.openfile fn [Unix.O_RDONLY] 0),
+    (* Read callback *)
+    (fun fd buf -> Unix.read fd buf 0 (Bytes.length buf)),
+    (* Skip callback *)
+    (fun fd request ->
+      ignore (Unix.lseek fd request Unix.SEEK_CUR);
+      request),
+    (* Close callback *)
+    (fun fd -> Unix.close fd),
+    (* Seek callback *)
+    Unix.lseek
+  )
+
 let ([] | _ :: _) =
   run_test_tt_main
     ("ocaml-archive"
@@ -97,6 +114,22 @@ let ([] | _ :: _) =
                  (read_tarball_lwt
                     (`Filename "data/ocaml-data-notation-0.0.6.tar.gz")
                     "ocaml-data-notation-0.0.6/_oasis")
+             in
+             ListString.assert_equal ~msg:"directory listing" exp_lst lst;
+             ListString.assert_equal ~msg:"_oasis content"
+               (ExtLib.String.nsplit exp_dump "\n")
+               (ExtLib.String.nsplit dump "\n") );
+           ( "seek" >:: fun () ->
+             let exp_lst, exp_dump =
+               read_tarball
+                 (Archive.Read.create
+                    (`Filename "data/ocaml-data-notation-0.0.6.tar.gz"))
+                 "ocaml-data-notation-0.0.6/_oasis"
+             in
+             let lst, dump =
+               read_tarball
+                 (Archive.Read.create (unix_input "data/ocaml-data-notation-0.0.6.tar.gz"))
+                 "ocaml-data-notation-0.0.6/_oasis"
              in
              ListString.assert_equal ~msg:"directory listing" exp_lst lst;
              ListString.assert_equal ~msg:"_oasis content"
