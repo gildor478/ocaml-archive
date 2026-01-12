@@ -19,10 +19,24 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-typedef struct archive *ptr_archive;
+#define READ_BUFFER 4096
+
+struct caml_archive {
+  struct archive *archive;
+  value open_cbk;
+  value read_cbk;
+  value skip_cbk;
+  value close_cbk;
+  value client_data;
+  value client_data2;
+  value buffer;
+  char  buffer_c[READ_BUFFER];
+};
+
+typedef struct caml_archive *ptr_archive;
 typedef struct archive_entry *ptr_archive_entry;
 
-void caml_archive_check_error (int error, ptr_archive arch)
+void caml_archive_check_error (int error, struct archive *arch)
 {
   value args[2];
 
@@ -157,15 +171,15 @@ CAMLprim value caml_archive_entry_stat (value ventry)
  * Archive
  */
 
-#define Archive_val(v) ((ptr_archive*) Data_custom_val(v))
+#define Archive_val(v) ((ptr_archive) Data_custom_val(v))
 
 void caml_archive_finalize (value vread)
 {
-  ptr_archive *ptr = Archive_val(vread);
-  if (*ptr != NULL)
+  ptr_archive ptr = Archive_val(vread);
+  if (ptr->archive != NULL)
   {
-    archive_read_free(*ptr);
-    *ptr = NULL;
+    archive_read_free(ptr->archive);
+    ptr->archive = NULL;
   };
 };
 
@@ -184,16 +198,16 @@ static struct custom_operations caml_archive_ops = {
 
 CAMLprim value caml_archive_read_create (value vunit)
 {
-  ptr_archive *ptr = NULL;
+  ptr_archive ptr = NULL;
   CAMLparam1(vunit);
   CAMLlocal1(vres);
 
   vres = caml_alloc_custom(&caml_archive_ops,
-      sizeof(ptr_archive),
+      sizeof(struct caml_archive),
       0, 1);
   ptr = Archive_val(vres);
-  *ptr = archive_read_new ();
-  if (*ptr == NULL)
+  ptr->archive = archive_read_new ();
+  if (ptr->archive == NULL)
   {
     caml_raise_with_string
       (*caml_named_value("archive.failure"),
@@ -204,29 +218,29 @@ CAMLprim value caml_archive_read_create (value vunit)
 
 CAMLprim value caml_archive_read_support_filter_all (value vread)
 {
-  ptr_archive *ptr = NULL;
+  ptr_archive ptr = NULL;
   CAMLparam1(vread);
   ptr = Archive_val(vread);
   caml_archive_check_error(
-      archive_read_support_filter_all(*ptr),
-      *ptr);
+      archive_read_support_filter_all(ptr->archive),
+      ptr->archive);
   CAMLreturn(Val_unit);
 };
 
 CAMLprim value caml_archive_read_support_format_all (value vread)
 {
-  ptr_archive *ptr = NULL;
+  ptr_archive ptr = NULL;
   CAMLparam1(vread);
   ptr = Archive_val(vread);
   caml_archive_check_error(
-      archive_read_support_format_all(*ptr),
-      *ptr);
+      archive_read_support_format_all(ptr->archive),
+      ptr->archive);
   CAMLreturn(Val_unit);
 };
 
 CAMLprim value caml_archive_read_open_filename (value vread, value vfn, value vblock_size)
 {
-  ptr_archive *ptr = NULL;
+  ptr_archive ptr = NULL;
   int   res = ARCHIVE_OK;
   int   block_size = 0;
   CAMLparam3(vread, vfn, vblock_size);
@@ -235,17 +249,17 @@ CAMLprim value caml_archive_read_open_filename (value vread, value vfn, value vb
   block_size = Int_val(vblock_size);
 
   caml_enter_blocking_section();
-  res = archive_read_open_filename( *ptr, fn, block_size);
+  res = archive_read_open_filename(ptr->archive, fn, block_size);
   caml_leave_blocking_section();
 
-  caml_archive_check_error(res, *ptr);
+  caml_archive_check_error(res, ptr->archive);
   CAMLreturn(Val_unit);
 };
 
 CAMLprim value caml_archive_read_next_header2 (value vread, value ventry)
 {
   int ret = 0;
-  ptr_archive *ptr = NULL;
+  ptr_archive ptr = NULL;
   ptr_archive_entry *ptre = NULL;
   CAMLparam2(vread, ventry);
   CAMLlocal1(vres);
@@ -253,7 +267,7 @@ CAMLprim value caml_archive_read_next_header2 (value vread, value ventry)
   ptre = Entry_val(ventry);
 
   caml_enter_blocking_section();
-  ret = archive_read_next_header2(*ptr, *ptre);
+  ret = archive_read_next_header2(ptr->archive, *ptre);
   caml_leave_blocking_section();
 
   switch (ret)
@@ -265,7 +279,7 @@ CAMLprim value caml_archive_read_next_header2 (value vread, value ventry)
       vres = Val_false;
       break;
     default:
-      caml_archive_check_error(ret, *ptr);
+      caml_archive_check_error(ret, ptr->archive);
       break;
   }
   CAMLreturn(vres);
@@ -273,23 +287,23 @@ CAMLprim value caml_archive_read_next_header2 (value vread, value ventry)
 
 CAMLprim value caml_archive_read_data_skip (value vread)
 {
-  ptr_archive *ptr = NULL;
+  ptr_archive ptr = NULL;
   int res = ARCHIVE_OK;
   CAMLparam1(vread);
   ptr = Archive_val(vread);
 
   caml_enter_blocking_section();
-  res = archive_read_data_skip(*ptr);
+  res = archive_read_data_skip(ptr->archive);
   caml_leave_blocking_section();
 
-  caml_archive_check_error(res, *ptr);
+  caml_archive_check_error(res, ptr->archive);
   CAMLreturn(Val_unit);
 };
 
 CAMLprim value caml_archive_read_data (value vread, value vstr, value voff, value vlen)
 {
   int size = 0;
-  ptr_archive *ptr = NULL;
+  ptr_archive ptr = NULL;
   int off = 0, len = 0;
 
   CAMLparam4(vread, vstr, voff, vlen);
@@ -305,29 +319,29 @@ CAMLprim value caml_archive_read_data (value vread, value vstr, value voff, valu
 
   caml_enter_blocking_section();
   char *str_off = (char*)str + off;
-  size = archive_read_data(*ptr, str_off, len);
+  size = archive_read_data(ptr->archive, str_off, len);
   caml_leave_blocking_section();
 
   if (size < 0)
   {
-    caml_archive_check_error(archive_errno(*ptr), *ptr);
+    caml_archive_check_error(archive_errno(ptr->archive), ptr->archive);
   };
   CAMLreturn(Val_int(size));
 };
 
 CAMLprim value caml_archive_read_close (value vread)
 {
-  ptr_archive *ptr = NULL;
+  ptr_archive ptr = NULL;
   int res = ARCHIVE_OK;
 
   CAMLparam1(vread);
   ptr = Archive_val(vread);
 
   caml_enter_blocking_section();
-  res = archive_read_close(*ptr);
+  res = archive_read_close(ptr->archive);
   caml_leave_blocking_section();
 
-  caml_archive_check_error(res, *ptr);
+  caml_archive_check_error(res, ptr->archive);
   CAMLreturn(Val_unit);
 };
 
@@ -335,19 +349,6 @@ CAMLprim value caml_archive_read_close (value vread)
 /*
  * read_open2 and all callbacks
  */
-
-#define READ_BUFFER 4096
-
-struct read_cbk_data {
-  value open_cbk;
-  value read_cbk;
-  value skip_cbk;
-  value close_cbk;
-  value client_data;
-  value client_data2;
-  value buffer;
-  char  buffer_c[READ_BUFFER];
-};
 
 CAMLprim int caml_archive_set_error (struct archive *ptr, value vres)
 {
@@ -375,7 +376,7 @@ CAMLprim int caml_archive_set_error (struct archive *ptr, value vres)
 }
 
 
-CAMLprim int caml_archive_open_callback2(struct archive *ptr, struct read_cbk_data *data)
+CAMLprim int caml_archive_open_callback2(struct archive *ptr, struct caml_archive *data)
 {
   int res = ARCHIVE_OK;
 
@@ -407,7 +408,7 @@ CAMLprim int caml_archive_open_callback(struct archive *ptr, void *client_data)
   return res;
 };
 
-CAMLprim ssize_t caml_archive_read_callback2(struct archive *ptr, struct read_cbk_data *data)
+CAMLprim ssize_t caml_archive_read_callback2(struct archive *ptr, struct caml_archive *data)
 {
   ssize_t ret = -1;
 
@@ -431,7 +432,7 @@ CAMLprim ssize_t caml_archive_read_callback2(struct archive *ptr, struct read_cb
 CAMLprim ssize_t caml_archive_read_callback(struct archive *ptr, void *client_data, const void **buffer)
 {
   ssize_t res = 0;
-  struct read_cbk_data *data = client_data;
+  struct caml_archive *data = client_data;
 
   caml_leave_blocking_section();
   res = caml_archive_read_callback2(ptr, data);
@@ -441,7 +442,7 @@ CAMLprim ssize_t caml_archive_read_callback(struct archive *ptr, void *client_da
   return res;
 };
 
-CAMLprim off_t caml_archive_skip_callback2(struct archive *ptr, struct read_cbk_data *data, off_t request)
+CAMLprim off_t caml_archive_skip_callback2(struct archive *ptr, struct caml_archive *data, off_t request)
 {
   off_t ret = 0;
 
@@ -472,7 +473,7 @@ CAMLprim off_t caml_archive_skip_callback(struct archive *ptr, void *client_data
 
 };
 
-CAMLprim int caml_archive_close_callback2 (struct archive *ptr, struct read_cbk_data *data)
+CAMLprim int caml_archive_close_callback2 (struct archive *ptr, struct caml_archive *data)
 {
   int ret = ARCHIVE_OK;
 
@@ -490,7 +491,7 @@ CAMLprim int caml_archive_close_callback2 (struct archive *ptr, struct read_cbk_
 CAMLprim int caml_archive_close_callback(struct archive *ptr, void *client_data)
 {
   int res = ARCHIVE_OK;
-  struct read_cbk_data *data = client_data;
+  struct caml_archive *data = client_data;
 
   caml_leave_blocking_section();
   res = caml_archive_close_callback2(ptr, data);
@@ -502,7 +503,6 @@ CAMLprim int caml_archive_close_callback(struct archive *ptr, void *client_data)
   caml_remove_global_root(&(data->buffer));
   caml_remove_global_root(&(data->client_data));
   caml_remove_global_root(&(data->client_data2));
-  caml_stat_free(data);
 
   caml_enter_blocking_section();
 
@@ -517,15 +517,16 @@ CAMLprim value caml_archive_read_open2_native (
     value vclose_cbk,
     value vdata)
 {
-  struct read_cbk_data *read_cbk = NULL;
-  ptr_archive *ptr = NULL;
+  struct caml_archive *read_cbk = NULL;
+  ptr_archive ptr = NULL;
   int res = ARCHIVE_OK;
 
   CAMLparam5(vread, vopen_cbk, vread_cbk, vskip_cbk, vclose_cbk);
   CAMLxparam1(vdata);
   CAMLlocal1(vbuffer);
 
-  read_cbk = caml_stat_alloc(sizeof(struct read_cbk_data));
+  ptr = Archive_val(vread);
+  read_cbk = ptr;
 
   caml_register_global_root(&(read_cbk->open_cbk));
   caml_register_global_root(&(read_cbk->read_cbk));
@@ -543,11 +544,9 @@ CAMLprim value caml_archive_read_open2_native (
   read_cbk->client_data = vdata;
   read_cbk->client_data2 = Val_unit;
 
-  ptr = Archive_val(vread);
-
   caml_enter_blocking_section();
   res = archive_read_open2(
-      *ptr,
+      ptr->archive,
       read_cbk,
       caml_archive_open_callback,
       caml_archive_read_callback,
@@ -555,7 +554,7 @@ CAMLprim value caml_archive_read_open2_native (
       caml_archive_close_callback);
   caml_leave_blocking_section();
 
-  caml_archive_check_error(res, *ptr);
+  caml_archive_check_error(res, ptr->archive);
 
   CAMLreturn(Val_unit);
 };
