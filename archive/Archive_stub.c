@@ -118,10 +118,12 @@ CAMLprim value caml_archive_entry_pathname (value ventry)
 {
   CAMLparam1(ventry);
   CAMLlocal1(vres);
-  /* TODO: check for null string */
-  vres =
-    caml_copy_string(
-      archive_entry_pathname(*Entry_val(ventry)));
+  const char *c = archive_entry_pathname(*Entry_val(ventry));
+  if (!c)
+    caml_raise_with_string
+      (*caml_named_value("archive.failure"),
+       "null pathname");
+  vres = caml_copy_string(c);
   CAMLreturn(vres);
 }
 
