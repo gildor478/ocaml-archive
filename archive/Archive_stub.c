@@ -316,7 +316,7 @@ CAMLprim value caml_archive_read_data (value vread, value vstr, value voff, valu
 
   ptr = Archive_val(vread);
   const char *str = String_val(vstr);
-  off = Int_val(voff);
+  off = Long_val(voff);
   len = Int_val(vlen);
 
   assert(caml_string_length(vstr) > off);
@@ -450,28 +450,28 @@ CAMLprim ssize_t caml_archive_read_callback(struct archive *ptr, void *client_da
   return res;
 };
 
-CAMLprim off_t caml_archive_skip_callback2(struct archive *ptr, struct caml_archive *data, off_t request)
+CAMLprim la_int64_t caml_archive_skip_callback2(struct archive *ptr, struct caml_archive *data, la_int64_t request)
 {
-  off_t ret = 0;
+  la_int64_t ret = 0;
 
   CAMLparam0();
   CAMLlocal1(res);
-  res = caml_callback2_exn(data->skip_cbk, data->client_data2, Val_int(request));
+  res = caml_callback2_exn(data->skip_cbk, data->client_data2, Val_long(request));
   if (caml_archive_set_error(ptr, res))
   {
     ret = 0;
   }
   else
   {
-    ret = Int_val(res);
+    ret = Long_val(res);
   };
 
-  CAMLreturnT(off_t, ret);
+  CAMLreturnT(la_int64_t, ret);
 };
 
-CAMLprim off_t caml_archive_skip_callback(struct archive *ptr, void *client_data, off_t request)
+CAMLprim la_int64_t caml_archive_skip_callback(struct archive *ptr, void *client_data, la_int64_t request)
 {
-  off_t res = 0;
+  la_int64_t res = 0;
 
   caml_leave_blocking_section();
   res = caml_archive_skip_callback2(ptr, client_data, request);
@@ -487,9 +487,9 @@ static int seek_command_table[] = {
   [SEEK_END]=2
 };
 
-CAMLprim off_t caml_archive_seek_callback2(struct archive *ptr, struct caml_archive *data, off_t offset, int whence)
+CAMLprim la_int64_t caml_archive_seek_callback2(struct archive *ptr, struct caml_archive *data, la_int64_t offset, int whence)
 {
-  off_t ret = 0;
+  la_int64_t ret = 0;
 
   CAMLparam0();
   CAMLlocal1(res);
@@ -500,15 +500,15 @@ CAMLprim off_t caml_archive_seek_callback2(struct archive *ptr, struct caml_arch
   }
   else
   {
-    ret = Int_val(res);
+    ret = Long_val(res);
   };
 
-  CAMLreturnT(off_t, ret);
+  CAMLreturnT(la_int64_t, ret);
 }
 
-CAMLprim off_t caml_archive_seek_callback(struct archive *ptr, void *client_data, off_t offset, int whence)
+CAMLprim la_int64_t caml_archive_seek_callback(struct archive *ptr, void *client_data, la_int64_t offset, int whence)
 {
-  off_t res = 0;
+  la_int64_t res = 0;
 
   caml_leave_blocking_section();
   res = caml_archive_seek_callback2(ptr, client_data, offset, whence);
