@@ -127,9 +127,9 @@ CAMLprim value caml_archive_entry_pathname (value ventry)
   CAMLreturn(vres);
 }
 
-/* Copied from otherlibs/unix/stat.c */
+/* same order as in otherlibs/unix/stat.c */
 static int file_kind_table[] = {
-  S_IFREG, S_IFDIR, S_IFCHR, S_IFBLK, S_IFLNK, S_IFIFO, S_IFSOCK
+  AE_IFREG, AE_IFDIR, AE_IFCHR, AE_IFBLK, AE_IFLNK, AE_IFIFO, AE_IFSOCK
 };
 
 static value stat_aux(const struct stat *buf)
