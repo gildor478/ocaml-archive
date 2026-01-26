@@ -132,42 +132,32 @@ static int file_kind_table[] = {
   AE_IFREG, AE_IFDIR, AE_IFCHR, AE_IFBLK, AE_IFLNK, AE_IFIFO, AE_IFSOCK
 };
 
-static value stat_aux(const struct stat *buf)
+CAMLprim value caml_archive_entry_stat (value ventry)
 {
-  int i = 0;
-  CAMLparam0();
-  CAMLlocal5(atime, mtime, ctime, offset, v);
-
-  atime = caml_copy_double((double) buf->st_atime);
-  mtime = caml_copy_double((double) buf->st_mtime);
-  ctime = caml_copy_double((double) buf->st_ctime);
-  offset = caml_copy_int64(buf->st_size);
+  CAMLparam1(ventry);
+  CAMLlocal1(v);
   v = caml_alloc_small(12, 0);
-  Field (v, 0) = Val_int (buf->st_dev);
-  Field (v, 1) = Val_int (buf->st_ino);
-  for (i = 0; i < sizeof(file_kind_table) / sizeof(int); i++)
+  struct archive_entry *e = *Entry_val(ventry);
+  Field (v, 0) = Val_int(archive_entry_dev(e));
+  Field (v, 1) = Val_int(archive_entry_ino(e));
+  const int kind = archive_entry_mode(e) & S_IFMT;
+  for (int i = 0; i < sizeof(file_kind_table) / sizeof(int); i++)
   {
-    if ((buf->st_mode & S_IFMT) == file_kind_table[i])
+    if (kind == file_kind_table[i])
     {
       Field (v, 2) = Val_int(i);
     }
   };
-  Field (v, 3) = Val_int (buf->st_mode & 07777);
-  Field (v, 4) = Val_int (buf->st_nlink);
-  Field (v, 5) = Val_int (buf->st_uid);
-  Field (v, 6) = Val_int (buf->st_gid);
-  Field (v, 7) = Val_int (buf->st_rdev);
-  Field (v, 8) = offset;
-  Field (v, 9) = atime;
-  Field (v, 10) = mtime;
-  Field (v, 11) = ctime;
+  Field (v, 3) = Val_int(archive_entry_mode(e));
+  Field (v, 4) = Val_int(archive_entry_nlink(e));
+  Field (v, 5) = Val_int(archive_entry_uid(e));
+  Field (v, 6) = Val_int(archive_entry_gid(e));
+  Field (v, 7) = Val_int(archive_entry_rdev(e));
+  Field (v, 8) = caml_copy_int64(archive_entry_size(e));
+  Field (v, 9) = caml_copy_double(archive_entry_atime(e));
+  Field (v, 10) = caml_copy_double(archive_entry_mtime(e));
+  Field (v, 11) = caml_copy_double(archive_entry_ctime(e));
   CAMLreturn(v);
-}
-
-CAMLprim value caml_archive_entry_stat (value ventry)
-{
-  CAMLparam1(ventry);
-  CAMLreturn(stat_aux(archive_entry_stat(*Entry_val(ventry))));
 };
 
 /*
