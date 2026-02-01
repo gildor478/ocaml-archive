@@ -578,6 +578,8 @@ CAMLprim value caml_archive_read_open2_native (
   CAMLxparam1(vdata);
   CAMLlocal1(vbuffer);
 
+  vbuffer = caml_alloc_string(READ_BUFFER);
+
   ptr = Archive_val(vread);
   read_cbk = ptr;
 
@@ -593,7 +595,7 @@ CAMLprim value caml_archive_read_open2_native (
   read_cbk->read_cbk  = vread_cbk;
   read_cbk->skip_cbk  = vskip_cbk;
   read_cbk->close_cbk = vclose_cbk;
-  read_cbk->buffer    = caml_alloc_string(READ_BUFFER);
+  read_cbk->buffer    = vbuffer;
   read_cbk->client_data = vdata;
   read_cbk->client_data2 = Val_unit;
 
