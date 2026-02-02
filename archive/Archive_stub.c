@@ -392,6 +392,8 @@ CAMLprim int caml_archive_open_callback2(struct archive *ptr, struct caml_archiv
   vres = caml_callback_exn(data->open_cbk, data->client_data);
   if (caml_archive_set_error(ptr, vres))
   {
+    data->close_cbk = Val_unit;
+    data->client_data2 = Val_unit;
     res = ARCHIVE_FATAL;
   }
   else
@@ -522,11 +524,14 @@ CAMLprim int caml_archive_close_callback2 (struct archive *ptr, struct caml_arch
 
   CAMLparam0();
   CAMLlocal1(res);
-  res = caml_callback_exn(data->close_cbk, data->client_data2);
-  if (caml_archive_set_error(ptr, res))
+  if (data->close_cbk != Val_unit)
   {
-    ret = ARCHIVE_FATAL;
-  };
+    res = caml_callback_exn(data->close_cbk, data->client_data2);
+    if (caml_archive_set_error(ptr, res))
+    {
+      ret = ARCHIVE_FATAL;
+    }
+  }
 
   CAMLreturnT(int, ret);
 };
