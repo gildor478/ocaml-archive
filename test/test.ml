@@ -135,4 +135,16 @@ let ([] | _ :: _) =
              ListString.assert_equal ~msg:"_oasis content"
                (ExtLib.String.nsplit exp_dump "\n")
                (ExtLib.String.nsplit dump "\n") );
+           ( "NoCloseAfterFailedOpen" >:: fun () ->
+             let a = ArchiveLow.Read.create () in
+             let () =
+               try
+                 let boom () = raise (ArchiveLow.AFailure (42, "message")) in
+                 let z _ _ = 0 in
+                 ArchiveLow.Read.open2 a boom z z ignore ()
+                 (* if the test fails, open2 will SEGFAULT *)
+               with ArchiveLow.AFailure (code, msg) ->
+                 assert_equal (code, msg) (42, "message")
+             in
+             ArchiveLow.Read.close a );
          ])
