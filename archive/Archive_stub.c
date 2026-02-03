@@ -368,7 +368,7 @@ CAMLprim int caml_archive_set_error (struct archive *ptr, value vres)
     if (Wosize_val(vexn) == 3 && Field(vexn, 0) == *caml_named_value("archive.failure"))
     {
       assert(Is_long(Field(vexn, 1)));
-      assert(Is_block(Field(vexn, 2) && Tag_val(Field(vexn, 2)) == String_tag));
+      assert(Is_block(Field(vexn, 2)) && Tag_val(Field(vexn, 2)) == String_tag);
       archive_set_error(ptr, Int_val(Field(vexn, 1)), "%s", String_val(Field(vexn, 2)));
     }
     else
