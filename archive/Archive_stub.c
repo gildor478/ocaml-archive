@@ -127,47 +127,37 @@ CAMLprim value caml_archive_entry_pathname (value ventry)
   CAMLreturn(vres);
 }
 
-/* Copied from otherlibs/unix/stat.c */
+/* same order as in otherlibs/unix/stat.c */
 static int file_kind_table[] = {
-  S_IFREG, S_IFDIR, S_IFCHR, S_IFBLK, S_IFLNK, S_IFIFO, S_IFSOCK
+  AE_IFREG, AE_IFDIR, AE_IFCHR, AE_IFBLK, AE_IFLNK, AE_IFIFO, AE_IFSOCK
 };
-
-static value stat_aux(const struct stat *buf)
-{
-  int i = 0;
-  CAMLparam0();
-  CAMLlocal5(atime, mtime, ctime, offset, v);
-
-  atime = caml_copy_double((double) buf->st_atime);
-  mtime = caml_copy_double((double) buf->st_mtime);
-  ctime = caml_copy_double((double) buf->st_ctime);
-  offset = caml_copy_int64(buf->st_size);
-  v = caml_alloc_small(12, 0);
-  Field (v, 0) = Val_int (buf->st_dev);
-  Field (v, 1) = Val_int (buf->st_ino);
-  for (i = 0; i < sizeof(file_kind_table) / sizeof(int); i++)
-  {
-    if ((buf->st_mode & S_IFMT) == file_kind_table[i])
-    {
-      Field (v, 2) = Val_int(i);
-    }
-  };
-  Field (v, 3) = Val_int (buf->st_mode & 07777);
-  Field (v, 4) = Val_int (buf->st_nlink);
-  Field (v, 5) = Val_int (buf->st_uid);
-  Field (v, 6) = Val_int (buf->st_gid);
-  Field (v, 7) = Val_int (buf->st_rdev);
-  Field (v, 8) = offset;
-  Field (v, 9) = atime;
-  Field (v, 10) = mtime;
-  Field (v, 11) = ctime;
-  CAMLreturn(v);
-}
 
 CAMLprim value caml_archive_entry_stat (value ventry)
 {
   CAMLparam1(ventry);
-  CAMLreturn(stat_aux(archive_entry_stat(*Entry_val(ventry))));
+  CAMLlocal1(v);
+  v = caml_alloc_small(12, 0);
+  struct archive_entry *e = *Entry_val(ventry);
+  Field (v, 0) = Val_int(archive_entry_dev(e));
+  Field (v, 1) = Val_int(archive_entry_ino(e));
+  const int kind = archive_entry_mode(e) & S_IFMT;
+  for (int i = 0; i < sizeof(file_kind_table) / sizeof(int); i++)
+  {
+    if (kind == file_kind_table[i])
+    {
+      Field (v, 2) = Val_int(i);
+    }
+  };
+  Field (v, 3) = Val_int(archive_entry_mode(e));
+  Field (v, 4) = Val_int(archive_entry_nlink(e));
+  Field (v, 5) = Val_int(archive_entry_uid(e));
+  Field (v, 6) = Val_int(archive_entry_gid(e));
+  Field (v, 7) = Val_int(archive_entry_rdev(e));
+  Field (v, 8) = caml_copy_int64(archive_entry_size(e));
+  Field (v, 9) = caml_copy_double(archive_entry_atime(e));
+  Field (v, 10) = caml_copy_double(archive_entry_mtime(e));
+  Field (v, 11) = caml_copy_double(archive_entry_ctime(e));
+  CAMLreturn(v);
 };
 
 /*
@@ -316,7 +306,7 @@ CAMLprim value caml_archive_read_data (value vread, value vstr, value voff, valu
 
   ptr = Archive_val(vread);
   const char *str = String_val(vstr);
-  off = Int_val(voff);
+  off = Long_val(voff);
   len = Int_val(vlen);
 
   assert(caml_string_length(vstr) > off);
@@ -450,28 +440,28 @@ CAMLprim ssize_t caml_archive_read_callback(struct archive *ptr, void *client_da
   return res;
 };
 
-CAMLprim off_t caml_archive_skip_callback2(struct archive *ptr, struct caml_archive *data, off_t request)
+CAMLprim la_int64_t caml_archive_skip_callback2(struct archive *ptr, struct caml_archive *data, la_int64_t request)
 {
-  off_t ret = 0;
+  la_int64_t ret = 0;
 
   CAMLparam0();
   CAMLlocal1(res);
-  res = caml_callback2_exn(data->skip_cbk, data->client_data2, Val_int(request));
+  res = caml_callback2_exn(data->skip_cbk, data->client_data2, Val_long(request));
   if (caml_archive_set_error(ptr, res))
   {
     ret = 0;
   }
   else
   {
-    ret = Int_val(res);
+    ret = Long_val(res);
   };
 
-  CAMLreturnT(off_t, ret);
+  CAMLreturnT(la_int64_t, ret);
 };
 
-CAMLprim off_t caml_archive_skip_callback(struct archive *ptr, void *client_data, off_t request)
+CAMLprim la_int64_t caml_archive_skip_callback(struct archive *ptr, void *client_data, la_int64_t request)
 {
-  off_t res = 0;
+  la_int64_t res = 0;
 
   caml_leave_blocking_section();
   res = caml_archive_skip_callback2(ptr, client_data, request);
@@ -487,9 +477,9 @@ static int seek_command_table[] = {
   [SEEK_END]=2
 };
 
-CAMLprim off_t caml_archive_seek_callback2(struct archive *ptr, struct caml_archive *data, off_t offset, int whence)
+CAMLprim la_int64_t caml_archive_seek_callback2(struct archive *ptr, struct caml_archive *data, la_int64_t offset, int whence)
 {
-  off_t ret = 0;
+  la_int64_t ret = 0;
 
   CAMLparam0();
   CAMLlocal1(res);
@@ -500,15 +490,15 @@ CAMLprim off_t caml_archive_seek_callback2(struct archive *ptr, struct caml_arch
   }
   else
   {
-    ret = Int_val(res);
+    ret = Long_val(res);
   };
 
-  CAMLreturnT(off_t, ret);
+  CAMLreturnT(la_int64_t, ret);
 }
 
-CAMLprim off_t caml_archive_seek_callback(struct archive *ptr, void *client_data, off_t offset, int whence)
+CAMLprim la_int64_t caml_archive_seek_callback(struct archive *ptr, void *client_data, la_int64_t offset, int whence)
 {
-  off_t res = 0;
+  la_int64_t res = 0;
 
   caml_leave_blocking_section();
   res = caml_archive_seek_callback2(ptr, client_data, offset, whence);

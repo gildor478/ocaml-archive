@@ -1,7 +1,7 @@
 depexts: [
   ["libarchive"] {os = "macos" & os-distribution = "homebrew"}
   ["libarchive"] {os = "macos" & os-distribution = "macports"}
-  ["libarchive-devel"] {os = "win32" & os-distribution = "cygwin"}
+  ["mingw64-x86_64-libarchive"] {os = "win32" & os-distribution = "cygwin"}
   ["libarchive-dev" "openssl-dev"] {os-distribution = "alpine"}
   ["libarchive-dev"] {os-family = "debian"}
   ["libarchive-dev"] {os-family = "ubuntu"}
